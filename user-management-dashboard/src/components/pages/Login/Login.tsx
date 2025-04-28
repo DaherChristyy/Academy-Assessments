@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { useSessionStore } from "../../../stores/sessionStore";
+import { toast } from "react-toastify"; 
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -10,7 +11,7 @@ const Login = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const setSession = useSessionStore((s) => s.setSession);
+  const setSession = useSessionStore((s) => s.setSession); 
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,8 +22,8 @@ const Login = () => {
       return;
     }
 
-    setLoading(true);
-    setError(null);
+    setLoading(true); 
+    setError(null);    
 
     try {
       const res = await fetch("/api/login", {
@@ -30,30 +31,30 @@ const Login = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password }),  
       });
 
-      const data = await res.json();
+      const data = await res.json(); 
 
       if (res.ok) {
-        const { accessToken, expiresIn } = data.result?.data || {};
+        const { accessToken, expiresIn } = data.result?.data || {}; 
 
         if (!accessToken || !expiresIn) {
           setError(data?.result?.message || "Invalid login response.");
           return;
         }
-        
 
         setSession(accessToken, expiresIn);
+
+        toast.success("Login successful!");
         navigate("/dashboard");
       } else {
-        setError(data?.result?.message || "Login failed.");
+        setError(data?.result?.message || "Login failed. Please check your credentials.");
       }
-      
     } catch (err) {
       setError("Something went wrong. Please try again.");
     } finally {
-      setLoading(false);
+      setLoading(false);  
     }
   };
 
